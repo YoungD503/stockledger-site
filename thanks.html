@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Welcome to StockLedger</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#f4f2ec;color:#1b211e;font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;padding:40px 20px}
+  .card{max-width:640px;margin:0 auto;background:#fff;border:1px solid #e2dfd6;border-radius:16px;padding:36px}
+  h1{font-family:Fraunces,serif;font-size:32px;margin:0 0 8px}
+  p{color:#5f6a64}
+  ol{padding-left:22px} li{margin-bottom:14px}
+  .btn{display:inline-block;background:#1d3b30;color:#fff;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:600;margin:8px 0 20px}
+  code{background:#f4f2ec;padding:2px 6px;border-radius:5px}
+  .note{background:#fdf1d8;border-radius:10px;padding:12px 14px;font-size:14px;color:#6b4800}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>You're in. Thank you!</h1>
+  <p>Your payment was processed securely by Stripe. Follow these steps to set up your inventory.</p>
+
+  <!-- REPLACE: the "Make a copy" link of your template sheet:
+       https://docs.google.com/spreadsheets/d/YOUR_TEMPLATE_ID/copy -->
+  <a class="btn" href="https://docs.google.com/spreadsheets/d/REPLACE_TEMPLATE_ID/copy" target="_blank">1. Copy StockLedger to my Google Drive</a>
+
+  <ol>
+    <li><b>Make the copy.</b> Click the button above, sign in to Google, then choose <b>Make a copy</b>.</li>
+    <li><b>Open the app.</b> In your new sheet, open the <b>Inventory</b> menu and choose <b>Open app</b>. The menu appears a few seconds after the sheet loads. Google asks you to authorize the script the first time. Choose your account, then <i>Advanced ▸ Go to StockLedger</i>, then <i>Allow</i>.</li>
+    <li><b>Activate.</b> Enter the same email you used at checkout.</li>
+    <li><b>Set up your business.</b> Go to <b>Settings</b> for your business name, currency, tax rate and alert email. Then add your products.</li>
+    <li><b>Use it on phones (optional).</b> Follow the "Phone access" steps in the setup guide to get a link your team can add to their home screens.</li>
+  </ol>
+
+  <p class="note">Bookmark this page. To update your card or cancel, use the <a href="https://billing.stripe.com/p/login/REPLACE_PORTAL">billing portal</a>.</p>
+  <p>Need help? Email <a href="mailto:support@REPLACE.com">support@REPLACE.com</a>.</p>
+</div>
+</body>
+</html>

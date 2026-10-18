@@ -1,0 +1,84 @@
+<!--
+  StockLedger live catalog widget
+  ─────────────────────────────────
+  Shows your products, prices and stock availability on ANY website
+  (WordPress, Wix, Squarespace, Shopify custom HTML block, plain HTML).
+
+  1. In your StockLedger spreadsheet: File ▸ Share ▸ Publish to web
+     ▸ choose the "Catalog" sheet ▸ "Comma-separated values (.csv)" ▸ Publish.
+  2. Paste that link into CSV_URL below.
+  3. Paste this whole block into your website where the catalog should appear.
+
+  The Catalog sheet contains ONLY public fields (SKU, name, category, price, in-stock).
+  Costs, suppliers, batches and sales are never published.
+  Google refreshes published data every few minutes.
+-->
+<div id="sl-catalog">
+  <style>
+    #sl-catalog{--sl-brand:#1d3b30;font-family:system-ui,sans-serif;color:#1b211e}
+    #sl-catalog .sl-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    #sl-catalog input,#sl-catalog select{padding:9px 11px;border:1px solid #ddd;border-radius:8px;font:inherit}
+    #sl-catalog input{flex:1;min-width:180px}
+    #sl-catalog .sl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+    #sl-catalog .sl-item{border:1px solid #e6e3da;border-radius:12px;padding:14px;background:#fff}
+    #sl-catalog .sl-cat{font-size:12px;color:#777;text-transform:uppercase;letter-spacing:.04em}
+    #sl-catalog .sl-name{font-weight:600;margin:4px 0 8px}
+    #sl-catalog .sl-price{font-size:18px;font-weight:700;color:var(--sl-brand)}
+    #sl-catalog .sl-stock{display:inline-block;margin-top:8px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px}
+    #sl-catalog .in{background:#e5f3ea;color:#2f7d4f} #sl-catalog .out{background:#fbe4e1;color:#b3362c}
+    #sl-catalog .sl-msg{color:#777;padding:12px 0}
+  </style>
+  <div class="sl-bar">
+    <input id="sl-q" placeholder="Search products…">
+    <select id="sl-c"><option value="">All categories</option></select>
+    <select id="sl-s"><option value="">All</option><option value="Yes">In stock only</option></select>
+  </div>
+  <div class="sl-grid" id="sl-grid"><div class="sl-msg">Loading products…</div></div>
+  <script>
+  (function () {
+    var CSV_URL = 'PASTE_YOUR_PUBLISHED_CATALOG_CSV_URL_HERE';
+    var CURRENCY = 'USD';
+    var SHOW_QTY = false;   // true = show exact quantity, false = just "In stock"
+
+    function parseCSV(text) {
+      var rows = [], row = [], f = '', q = false;
+      for (var i = 0; i < text.length; i++) {
+        var c = text[i];
+        if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+        else if (c === '"') q = true;
+        else if (c === ',') { row.push(f); f = ''; }
+        else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(f); rows.push(row); row = []; f = ''; }
+        else f += c;
+      }
+      if (f || row.length) { row.push(f); rows.push(row); }
+      var h = rows.shift() || [];
+      return rows.filter(function (r) { return r.length > 1; }).map(function (r) {
+        var o = {}; h.forEach(function (k, j) { o[k.trim()] = (r[j] || '').trim(); }); return o;
+      });
+    }
+    function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function money(n) { try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: CURRENCY }).format(n); } catch (e) { return n; } }
+
+    var items = [], grid = document.getElementById('sl-grid');
+    function render() {
+      var q = document.getElementById('sl-q').value.toLowerCase(), c = document.getElementById('sl-c').value, s = document.getElementById('sl-s').value;
+      var list = items.filter(function (p) {
+        return (!q || (p.Name + ' ' + p.SKU).toLowerCase().indexOf(q) > -1) && (!c || p.Category === c) && (!s || p.InStock === s);
+      });
+      grid.innerHTML = list.map(function (p) {
+        var inS = p.InStock === 'Yes';
+        return '<div class="sl-item"><div class="sl-cat">' + esc(p.Category) + '</div><div class="sl-name">' + esc(p.Name) + '</div>' +
+          '<div class="sl-price">' + money(Number(p.Price)) + (p.Unit && p.Unit !== 'unit' ? ' <small>/ ' + esc(p.Unit) + '</small>' : '') + '</div>' +
+          '<span class="sl-stock ' + (inS ? 'in' : 'out') + '">' + (inS ? (SHOW_QTY ? esc(p.Qty) + ' in stock' : 'In stock') : 'Out of stock') + '</span></div>';
+      }).join('') || '<div class="sl-msg">No products match.</div>';
+    }
+    fetch(CSV_URL).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (t) {
+      items = parseCSV(t);
+      var cats = {}; items.forEach(function (p) { if (p.Category) cats[p.Category] = 1; });
+      Object.keys(cats).sort().forEach(function (k) { var o = document.createElement('option'); o.textContent = k; document.getElementById('sl-c').appendChild(o); });
+      ['sl-q', 'sl-c', 'sl-s'].forEach(function (id) { document.getElementById(id).addEventListener('input', render); });
+      render();
+    }).catch(function () { grid.innerHTML = '<div class="sl-msg">Catalog unavailable right now.</div>'; });
+  })();
+  </script>
+</div>
